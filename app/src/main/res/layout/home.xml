@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:weightSum="10"
+    android:background="@drawable/bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:background="@color/red"
+        android:layout_weight="1.8">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:paddingRight="40dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Spinner
+                android:id="@+id/part_number_spinner"
+                style="@style/spinner_style_red"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@drawable/yellow_blank_withoutcurve_box"
+            android:layout_weight="1">
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:textColor="@color/yellow"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:background="@color/red"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/text_size"
+                android:text="MSA - 11"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:paddingRight="40dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Spinner
+                android:id="@+id/operator_name_spinner"
+                style="@style/spinner_style_red"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@color/dark_red"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_weight="6.4">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- ************* OEE *******************-->
+
+        <TextView
+            android:id="@+id/oee_quality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="It's a text"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:textSize="65dp"
+            android:textColor="@color/red"
+            android:textStyle="bold"/>
+
+            <!-- ************* Part number *******************-->
+
+            <LinearLayout
+                android:id="@+id/part_number_layout"
+                android:layout_width="match_parent"
+                android:visibility="invisible"
+                android:layout_marginLeft="80dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="80dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:weightSum="10"
+                    android:background="@drawable/blue_blank_box">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1.5"
+                        android:gravity="center"
+                        android:background="@color/blue"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/part_numbering"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="8.5"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginRight="4dp"
+                        android:gravity="center"
+                        android:paddingRight="8dp"
+                        android:background="@color/white"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:hint="part number"
+                            android:paddingLeft="20dp"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/blue"
+                            android:textSize="@dimen/text_size"
+                            android:drawableRight="@drawable/field_dropdown"
+                            android:background="@null"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:orientation="horizontal"
+                    android:layout_weight="10"
+                    android:layout_marginTop="30dp"
+                    >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:text="Part Picture"
+                        android:textColor="@color/red"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="@dimen/text_size"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="7"
+                        android:gravity="center"
+                        android:background="@drawable/white_yellow_box">
+                        <ImageView
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@mipmap/ic_launcher"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ************* cpp / cpk *******************-->
+
+            <LinearLayout
+                android:id="@+id/cpp_cpk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/cp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CP : XXXX"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                android:textSize="65dp"
+                android:textColor="@color/red"
+                android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/cpk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CPK : XXXX"
+                    android:layout_gravity="center"
+                    android:visibility="visible"
+                    android:textSize="65dp"
+                    android:layout_marginTop="40dp"
+                    android:textColor="@color/red"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <!-- ************* Spindle run *******************-->
+
+            <LinearLayout
+                android:id="@+id/spindle_run"
+                android:layout_width="match_parent"
+                android:layout_marginRight="80dp"
+                android:layout_marginLeft="80dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Number of Spindle Run"
+                    android:layout_gravity="center"
+                    android:visibility="visible"
+                    android:textSize="65dp"
+                    android:textColor="@color/red"
+                    android:textStyle="bold"/>
+
+
+               <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:weightSum="10"
+                   android:layout_marginTop="40dp"
+            android:background="@drawable/blue_blank_box">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:background="@color/blue"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/spindle"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="8.5"
+                android:layout_marginBottom="4dp"
+                android:layout_marginRight="4dp"
+                android:gravity="center"
+                android:paddingRight="8dp"
+                android:background="@color/white"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="no of spindle run"
+                    android:paddingLeft="20dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/text_size"
+                    android:drawableRight="@drawable/field_dropdown"
+                    android:background="@null"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+            </LinearLayout>
+
+            <!--  ******************************************* -->
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:background="@color/blue"
+        android:layout_weight="1.8"
+        android:weightSum="3"
+
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:weightSum="4"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:layout_weight="1.2">
+
+            <LinearLayout
+                android:id="@+id/cal_layout"
+                android:layout_width="0dp"
+                android:background="@drawable/yellow_box"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_marginRight="20dp"
+                android:layout_weight="0.6">
+                <ImageView
+                    android:id="@+id/cal_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/calc"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/start_layout"
+                android:layout_width="0dp"
+                android:background="@drawable/yellow_box"
+                android:gravity="center"
+                android:layout_height="match_parent"
+                android:layout_weight="3.4">
+
+                <Button
+                    android:id="@+id/start_button"
+                    android:layout_width="wrap_content"
+                    android:background="@null"
+                    android:textColor="@color/red"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:text="Start"
+                    android:textSize="@dimen/text_size"
+                    android:drawablePadding="12dp"
+                    android:drawableRight="@drawable/frwd_arrow"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sat 10-12-2016"
+                android:textSize="@dimen/text_size"
+                android:textColor="@color/yellow"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2:30 pm"
+                android:textSize="@dimen/text_size"
+                android:textColor="@color/yellow"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:weightSum="4"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:layout_weight="0.8">
+
+
+
+            <LinearLayout
+                android:id="@+id/menu_layout"
+                android:layout_width="0dp"
+                android:background="@drawable/yellow_box"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingRight="10dp"
+                android:layout_weight="4">
+                <Spinner
+                    android:id="@+id/menu_spinner"
+                    style="@style/spinner_style_new"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

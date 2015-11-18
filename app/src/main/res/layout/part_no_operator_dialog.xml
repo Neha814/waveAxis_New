@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:id="@+id/rr"
+    android:minWidth="1000dp"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="100dp"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:background="@drawable/white_box"
+        android:paddingBottom="100dp"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:weightSum="10"
+            android:background="@drawable/blue_blank_box">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:background="@color/blue"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/part_numbering"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="8.5"
+                android:layout_marginBottom="4dp"
+                android:layout_marginRight="4dp"
+                android:gravity="center"
+                android:paddingRight="8dp"
+                android:background="@color/white"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="part number"
+                    android:paddingLeft="20dp"
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/text_size"
+                    android:drawableRight="@drawable/field_dropdown"
+                    android:background="@null"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:weightSum="10"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/blue_blank_box">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:background="@color/blue"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/operator"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="8.5"
+                android:layout_marginBottom="4dp"
+                android:layout_marginRight="4dp"
+                android:gravity="center"
+                android:paddingRight="8dp"
+                android:background="@color/white"
+                android:layout_height="match_parent">
+           <EditText
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:hint="operator name"
+               android:paddingLeft="20dp"
+               android:textColor="@color/blue"
+               android:textSize="@dimen/text_size"
+               android:drawableRight="@drawable/field_dropdown"
+               android:background="@null"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:weightSum="2"
+        android:orientation="horizontal"
+        android:background="@color/dark_yellow">
+
+        <LinearLayout
+            android:id="@+id/save_layout"
+            android:layout_width="0dp"
+            android:background="@color/blue"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:background="@null"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:text="Save"
+                android:textSize="@dimen/text_size"
+                android:drawablePadding="12dp"
+                android:drawableLeft="@drawable/save"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/next_layout"
+            android:layout_width="0dp"
+            android:background="@color/red"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/next_button"
+                android:layout_width="wrap_content"
+                android:background="@null"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:text="Next"
+                android:textSize="@dimen/text_size"
+                android:drawablePadding="12dp"
+                android:drawableLeft="@drawable/next_arrow"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</RelativeLayout>
