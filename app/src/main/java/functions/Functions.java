@@ -15,47 +15,102 @@ public class Functions {
     public static String url="http://phphosting.osvin.net/waveaxisNew/Web_API/";
 
 	/**
-	 * Login
-	 * 
+	 * Add device
 	 * @param localArrayList
 	 * @return
 	 */
 
-	public HashMap login(ArrayList localArrayList) {
+	public HashMap AddDevice(ArrayList localArrayList) {
 		ArrayList<HashMap<String, String>> locallist = new ArrayList<HashMap<String, String>>();
 		@SuppressWarnings("rawtypes")
 		HashMap<String, String> localHashMap = new HashMap<String, String>();
 		try {
 
 			JSONObject localJSONObject = new JSONObject(Html.fromHtml(
-					this.json.makeHttpRequest(url + "login.php?", "POST",
+					this.json.makeHttpRequest(url + "addDevice.php?", "POST",
 							localArrayList)).toString());
 
-			String status = localJSONObject.getString("ResponseCode");
+			String status = localJSONObject.getString("Response");
 			if (status.equalsIgnoreCase("true")) {
-				localHashMap.put("ResponseCode", "true");
-				localHashMap.put("Message",
-						localJSONObject.getString("Message"));
-				localHashMap.put("user_id",
-						localJSONObject.getString("user_id"));
+				JSONObject GetData = localJSONObject.getJSONObject("GetData");
 
-				localHashMap.put("first_name",
-						localJSONObject.getString("first_name"));
-				localHashMap.put("last_name",
-						localJSONObject.getString("last_name"));
-				localHashMap.put("latitude",
-						localJSONObject.getString("latitude"));
-				localHashMap.put("longitude",
-						localJSONObject.getString("longitude"));
-				// localHashMap.put("access_token",localJSONObject.getString("access_token"));
 
-				localHashMap.put("email", localJSONObject.getString("email"));
-                localHashMap.put("login_via", localJSONObject.getString("login_via"));
+				localHashMap.put("Response", "true");
+				localHashMap.put("deviceid", GetData.getString("deviceid"));
 
 			} else {
-				localHashMap.put("ResponseCode", "false");
-				localHashMap.put("Message",
-						localJSONObject.getString("Message"));
+				localHashMap.put("Response", "false");
+			}
+			return localHashMap;
+
+		} catch (Exception ae) {
+			ae.printStackTrace();
+			return localHashMap;
+
+		}
+
+	}
+
+	/**
+	 * Login
+	 * 
+	 * @param localArrayList
+	 * @return
+	 */
+
+	public HashMap GetMachineDetails(ArrayList localArrayList) {
+		ArrayList<HashMap<String, String>> locallist = new ArrayList<HashMap<String, String>>();
+		@SuppressWarnings("rawtypes")
+		HashMap<String, String> localHashMap = new HashMap<String, String>();
+		try {
+
+			JSONObject localJSONObject = new JSONObject(Html.fromHtml(
+					this.json.makeHttpRequest(url + "getMachinenModule.php?", "POST",
+							localArrayList)).toString());
+
+			String status = localJSONObject.getString("Response");
+			if (status.equalsIgnoreCase("true")) {
+				JSONObject GetData = localJSONObject.getJSONObject("GetData");
+				JSONObject machine = GetData.getJSONObject("machine");
+				JSONObject features = GetData.getJSONObject("features");
+				JSONArray parts = GetData.getJSONArray("parts");
+                JSONArray operators = GetData.getJSONArray("operators");
+
+
+                localHashMap.put("Response", "true");
+                localHashMap.put("machine_id", machine.getString("machine_id"));
+                localHashMap.put("machine_name", machine.getString("machine_name"));
+
+                localHashMap.put("equipment_effectiveness", features.getString("equipment_effectiveness"));
+                localHashMap.put("no_of_spindleRun", features.getString("no_of_spindleRun"));
+                localHashMap.put("cp", features.getString("cp"));
+                localHashMap.put("cpk", features.getString("cpk"));
+                localHashMap.put("quality_issue", features.getString("quality_issue"));
+
+                Constants.partsList.clear();
+                for(int i=0 ; i<parts.length();i++){
+                    HashMap<String, String> localHashMap1 = new HashMap<String, String>();
+
+                    localHashMap1.put("part_no", parts.getJSONObject(i).getString("part_no"));
+                    localHashMap1.put("part_image", parts.getJSONObject(i).getString("part_image"));
+                    localHashMap1.put("created", parts.getJSONObject(i).getString("created"));
+
+                    Constants.partsList.add(localHashMap1);
+                }
+
+                Constants.operatorList.clear();
+                for(int i=0 ; i<operators.length();i++){
+                    HashMap<String, String> localHashMap2 = new HashMap<String, String>();
+
+                    localHashMap2.put("operator_id", operators.getJSONObject(i).getString("operator_id"));
+                    localHashMap2.put("operator_name", operators.getJSONObject(i).getString("operator_name"));
+
+                    Constants.operatorList.add(localHashMap2);
+                }
+
+
+			} else {
+				localHashMap.put("Response", "false");
 			}
 			return localHashMap;
 

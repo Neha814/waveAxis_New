@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import functions.Constants;
 import imageloader.ImageLoader;
 import utils.NetConnection;
 
@@ -43,9 +44,11 @@ public class Home extends Activity implements View.OnClickListener {
 
     Button start_button;
 
-    TextView oee_quality;
+    TextView oee_quality, spindle_value, cp, cpk, part_value, msa;
 
     LinearLayout part_number_layout , cpp_cpk, spindle_run;
+
+    ImageView part_image;
 
     int timerCount = 0;
 
@@ -79,6 +82,12 @@ public class Home extends Activity implements View.OnClickListener {
         part_number_layout = (LinearLayout) findViewById(R.id.part_number_layout);
         cpp_cpk = (LinearLayout) findViewById(R.id.cpp_cpk);
         spindle_run = (LinearLayout) findViewById(R.id.spindle_run);
+        spindle_value = (TextView) findViewById(R.id.spindle_value);
+        cp = (TextView) findViewById(R.id.cp);
+        cpk = (TextView) findViewById(R.id.cpk);
+        part_value = (TextView) findViewById(R.id.part_value);
+        part_image = (ImageView) findViewById(R.id.part_image);
+        msa = (TextView) findViewById(R.id.msa);
 
         oee_quality.setVisibility(View.GONE);
         part_number_layout.setVisibility(View.GONE);
@@ -87,8 +96,11 @@ public class Home extends Activity implements View.OnClickListener {
 
         // set adapter for part number and images
 
-        ArrayList<String> partList = new ArrayList<String>();
+        final ArrayList<String> partList = new ArrayList<String>();
         partList.add("Part Number");
+        for(int i=0;i<Constants.partsList.size();i++){
+           partList.add(Constants.partsList.get(i).get("part_no")) ;
+        }
         mAdapter1 = new MyAdapter1(getApplicationContext(),
                 partList);
         part_number_spinner.setAdapter(mAdapter1);
@@ -97,6 +109,9 @@ public class Home extends Activity implements View.OnClickListener {
 
         ArrayList<String> operatorList = new ArrayList<String>();
         operatorList.add("Operator Name");
+        for(int i=0;i<Constants.operatorList.size();i++) {
+            operatorList.add(Constants.operatorList.get(i).get("operator_name")) ;
+        }
         mAdapter1 = new MyAdapter1(getApplicationContext(),
                 operatorList);
         operator_name_spinner.setAdapter(mAdapter1);
@@ -133,7 +148,51 @@ public class Home extends Activity implements View.OnClickListener {
            }
        });
 
+        part_number_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i==0){
+                    Constants.PART_IAMGE = "";
+                    Constants.PART_NUMBER = "no part number selected";
+                }
+                else {
+                    Constants.PART_NUMBER = "Part Number : " + partList.get(i);
+                    Constants.PART_IAMGE = Constants.partsList.get(i-1).get("part_image");
 
+                    Log.e("image url==>",""+Constants.PART_IAMGE);
+
+                    showPartImageDialog();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        operator_name_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i==0){
+                    Constants.OPERATOR_NAME = "";
+                    Constants.OPERATOR_ID = "";
+                }
+                else {
+                    Constants.OPERATOR_NAME = Constants.operatorList.get(i).get("operator_name");
+                    Constants.OPERATOR_ID = Constants.operatorList.get(i).get("operator_id");
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
+        msa.setText("MSA - " + Constants.MACHINE_ID);
        final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -146,7 +205,7 @@ public class Home extends Activity implements View.OnClickListener {
                     cpp_cpk.setVisibility(View.GONE);
                     spindle_run.setVisibility(View.GONE);
 
-                    oee_quality.setText("Overall Equipment Effectiveness 86.35%");
+                    oee_quality.setText("Overall Equipment Effectiveness : "+ Constants.OEE);
                 }
 
                 else if (timerCount == 1) {
@@ -154,6 +213,8 @@ public class Home extends Activity implements View.OnClickListener {
                     part_number_layout.setVisibility(View.GONE);
                     cpp_cpk.setVisibility(View.GONE);
                     spindle_run.setVisibility(View.VISIBLE);
+
+                    spindle_value.setText("No of Spindle Run : "+Constants.SPINDLE);
                 }
 
                 else if (timerCount == 2) {
@@ -161,6 +222,9 @@ public class Home extends Activity implements View.OnClickListener {
                     part_number_layout.setVisibility(View.GONE);
                     spindle_run.setVisibility(View.GONE);
                     cpp_cpk.setVisibility(View.VISIBLE);
+
+                    cp.setText("CP : "+Constants.CP);
+                    cpk.setText("CPK : "+Constants.CPK);
                 }
 
                 else if (timerCount == 3) {
@@ -170,7 +234,7 @@ public class Home extends Activity implements View.OnClickListener {
                     spindle_run.setVisibility(View.GONE);
                     cpp_cpk.setVisibility(View.GONE);
 
-                    oee_quality.setText("Quality Issue");
+                    oee_quality.setText("Quality Issue : "+Constants.QULAITY_ISSUE);
                 }
 
                 else if(timerCount == 4){
@@ -178,6 +242,10 @@ public class Home extends Activity implements View.OnClickListener {
                     part_number_layout.setVisibility(View.VISIBLE);
                     spindle_run.setVisibility(View.GONE);
                     cpp_cpk.setVisibility(View.GONE);
+
+                    part_value.setText(Constants.PART_NUMBER);
+                    imageLoader.DisplayImage(Constants.PART_IAMGE,R.drawable.noimg,part_image);
+
 
                 }
 
@@ -191,6 +259,37 @@ public class Home extends Activity implements View.OnClickListener {
 
 
     }
+
+
+
+        protected void showPartImageDialog() {
+            try {
+                final Dialog dialog;
+                dialog = new Dialog(Home.this,R.style.Theme_Dialog);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.getWindow().setFormat(PixelFormat.TRANSLUCENT);
+                dialog.setContentView(R.layout.partimage_dialog);
+               getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                dialog.setCancelable(true);
+                Drawable d = new ColorDrawable(Color.BLACK);
+                d.setAlpha(0);
+                dialog.getWindow().setBackgroundDrawable(d);
+
+                ImageView part_iamge;
+
+                part_iamge = (ImageView) dialog.findViewById(R.id.part_iamge);
+
+                Log.e("url==>",""+Constants.PART_IAMGE);
+
+                imageLoader.DisplayImage(Constants.PART_IAMGE,R.drawable.noimg,part_iamge);
+                dialog.show();
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+
+        }
+
 
     protected void showSettingDialog() {
         try {
@@ -239,7 +338,7 @@ public class Home extends Activity implements View.OnClickListener {
             });
             dialog.show();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
         }
 
@@ -296,6 +395,7 @@ public class Home extends Activity implements View.OnClickListener {
         }
 
         public View getCustomView(int position, View convertView, ViewGroup parent, int spinnerRow, boolean isDefaultRow) {
+
             LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View row = inflater.inflate(spinnerRow, parent, false);
             TextView txt = (TextView)row.findViewById(R.id.text);

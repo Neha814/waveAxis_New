@@ -80,7 +80,6 @@ public class Interruption_screen extends Activity {
 
         @Override
         public long getItemId(int position) {
-            // TODO Auto-generated method stub
             return position;
         }
 
