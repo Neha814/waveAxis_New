@@ -710,4 +710,12 @@ public class InterruptionScreen extends Activity implements View.OnClickListener
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent i = new Intent(InterruptionScreen.this, Home.class);
+        startActivity(i);
+    }
 }

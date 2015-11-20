@@ -290,17 +290,22 @@ public class Home extends Activity implements View.OnClickListener {
                 public void onClick(View view) {
                     dialog.dismiss();
 
+
                     int partPOS =  inner_part_spinner.getSelectedItemPosition();
                     int opPOS = inner_operator_spinner.getSelectedItemPosition();
 
-                  String   partID = Constants.partsList.get(partPOS).get("part_id");
-                   String  opID = Constants.partsList.get(opPOS).get("operator_id");
+
+                    Log.e("partPOS==>",""+partPOS);
+                    Log.e("opPOS==>",""+opPOS);
 
                     if(partPOS==0){
                         showDialog("Please select Part Number");
                     } else if(opPOS==0){
                         showDialog("Please select Operator Name");
                     } else {
+
+                        String   partID = Constants.partsList.get(partPOS-1).get("part_id");
+                        String  opID = Constants.operatorList.get(opPOS-1).get("operator_id");
                         CallSettingAPI(partID,opID);
                     }
 
@@ -312,6 +317,28 @@ public class Home extends Activity implements View.OnClickListener {
                 @Override
                 public void onClick(View view) {
                     dialog.dismiss();
+
+
+                    int partPOS =  inner_part_spinner.getSelectedItemPosition();
+                    int opPOS = inner_operator_spinner.getSelectedItemPosition();
+
+
+                    Log.e("partPOS==>",""+partPOS);
+                    Log.e("opPOS==>",""+opPOS);
+
+                    if(partPOS==0){
+                        showDialog("Please select Part Number");
+                    } else if(opPOS==0){
+                        showDialog("Please select Operator Name");
+                    } else {
+
+                        String   partID = Constants.partsList.get(partPOS-1).get("part_id");
+                        String  opID = Constants.operatorList.get(opPOS-1).get("operator_id");
+                        CallSettingAPI(partID,opID);
+                    }
+
+
+
 
                 }
             });
@@ -864,7 +891,6 @@ public class Home extends Activity implements View.OnClickListener {
         handler.postDelayed(new Runnable() {
             public void run() {
 
-                Log.e("timer==>", "" + timerCount);
                 if (timerCount == 0) {
 
                     oee_quality.setVisibility(View.VISIBLE);
