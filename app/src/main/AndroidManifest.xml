@@ -40,7 +40,12 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="Interruption_screen"
+            android:name=".InterruptionScreen"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name=".NewSettingChangeOver"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan" >
         </activity>

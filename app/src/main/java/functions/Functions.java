@@ -51,8 +51,81 @@ public class Functions {
 
 	}
 
+    /**
+     * SignIn
+     * @param localArrayList
+     * @return
+     */
+
+    public HashMap SignIn(ArrayList localArrayList) {
+        ArrayList<HashMap<String, String>> locallist = new ArrayList<HashMap<String, String>>();
+        @SuppressWarnings("rawtypes")
+        HashMap<String, String> localHashMap = new HashMap<String, String>();
+        try {
+
+            JSONObject localJSONObject = new JSONObject(Html.fromHtml(
+                    this.json.makeHttpRequest(url + "CheckCredentials.php?", "POST",
+                            localArrayList)).toString());
+
+            String status = localJSONObject.getString("Response");
+            if (status.equalsIgnoreCase("true")) {
+
+                localHashMap.put("Response", "true");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+
+            } else {
+                localHashMap.put("Response", "false");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+            }
+            return localHashMap;
+
+        } catch (Exception ae) {
+            ae.printStackTrace();
+            return localHashMap;
+
+        }
+
+    }
+
+    /**
+     * Reset Target Time
+     * @param localArrayList
+     * @return
+     */
+
+
+    public HashMap ResetTargetTime(ArrayList localArrayList) {
+        ArrayList<HashMap<String, String>> locallist = new ArrayList<HashMap<String, String>>();
+        @SuppressWarnings("rawtypes")
+        HashMap<String, String> localHashMap = new HashMap<String, String>();
+        try {
+
+            JSONObject localJSONObject = new JSONObject(Html.fromHtml(
+                    this.json.makeHttpRequest(url + "ResetTargetTime.php?", "POST",
+                            localArrayList)).toString());
+
+            String status = localJSONObject.getString("ResponseCode");
+            if (status.equalsIgnoreCase("true")) {
+
+                localHashMap.put("Response", "true");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+
+            } else {
+                localHashMap.put("Response", "false");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+            }
+            return localHashMap;
+
+        } catch (Exception ae) {
+            ae.printStackTrace();
+            return localHashMap;
+
+        }
+
+    }
+
 	/**
-	 * Login
+	 * Machine details
 	 * 
 	 * @param localArrayList
 	 * @return
@@ -86,11 +159,17 @@ public class Functions {
                 localHashMap.put("cp", features.getString("cp"));
                 localHashMap.put("cpk", features.getString("cpk"));
                 localHashMap.put("quality_issue", features.getString("quality_issue"));
+                localHashMap.put("default_part_no", features.getString("default_part_no"));
+                localHashMap.put("default_operator", features.getString("default_operator"));
+                localHashMap.put("default_operator_id", features.getString("default_operator_id"));
+                localHashMap.put("default_part_id", features.getString("default_part_id"));
+                localHashMap.put("default_part_image", features.getString("default_part_image"));
 
                 Constants.partsList.clear();
                 for(int i=0 ; i<parts.length();i++){
                     HashMap<String, String> localHashMap1 = new HashMap<String, String>();
 
+                    localHashMap1.put("part_id", parts.getJSONObject(i).getString("part_id"));
                     localHashMap1.put("part_no", parts.getJSONObject(i).getString("part_no"));
                     localHashMap1.put("part_image", parts.getJSONObject(i).getString("part_image"));
                     localHashMap1.put("created", parts.getJSONObject(i).getString("created"));
@@ -127,32 +206,25 @@ public class Functions {
 	 * category Listing
 	 */
 
-	public ArrayList<HashMap<String, String>> getCategoryList(
+	public ArrayList<HashMap<String, String>> getInterruptionList(
 			ArrayList localArrayList) {
 		ArrayList<HashMap<String, String>> localArrayList1 = new ArrayList<HashMap<String, String>>();
 
 		try {
 
 			JSONObject localJSONObject = new JSONObject(Html.fromHtml(
-					this.json.makeHttpRequest(url + "listCategories.php?",
+					this.json.makeHttpRequest(url + "getInterruptionList.php?",
 							"POST", localArrayList)).toString());
 
-			String resopnse = localJSONObject.getString("ResponseCode");
+			String resopnse = localJSONObject.getString("Response");
 			if (resopnse.equalsIgnoreCase("true")) {
 
-				JSONArray Data = localJSONObject.getJSONArray("result");
-				for (int i = 0; i < Data.length(); i++) {
+				JSONArray interruption = localJSONObject.getJSONObject("GetData").getJSONArray("interruption");
+				for (int i = 0; i < interruption.length(); i++) {
 					HashMap<String, String> localhashMap = new HashMap<String, String>();
-					localhashMap.put("id", Data.getJSONObject(i)
-							.getString("id"));
-					localhashMap.put("title",
-							Data.getJSONObject(i).getString("title"));
-					localhashMap.put("image",
-							Data.getJSONObject(i).getString("image"));
-					localhashMap.put("icon1",
-							Data.getJSONObject(i).getString("icon1"));
-					localhashMap.put("icon2",
-							Data.getJSONObject(i).getString("icon2"));
+					localhashMap.put("interruption_id", interruption.getJSONObject(i).getString("interruption_id"));
+                    localhashMap.put("interruption_name", interruption.getJSONObject(i).getString("interruption_name"));
+                    localhashMap.put("target_time", interruption.getJSONObject(i).getString("target_time"));
 
 					localArrayList1.add(localhashMap);
 
@@ -168,6 +240,80 @@ public class Functions {
 		}
 
 	}
+
+    /**
+     * Fix Interrupt
+     * @param localArrayList
+     * @return
+     */
+
+    public HashMap fixInterrupt(ArrayList localArrayList) {
+        ArrayList<HashMap<String, String>> locallist = new ArrayList<HashMap<String, String>>();
+        @SuppressWarnings("rawtypes")
+        HashMap<String, String> localHashMap = new HashMap<String, String>();
+        try {
+
+            JSONObject localJSONObject = new JSONObject(Html.fromHtml(
+                    this.json.makeHttpRequest(url + "InterruptionTimer.php?", "POST",
+                            localArrayList)).toString());
+
+            String status = localJSONObject.getString("ResponseCode");
+            if (status.equalsIgnoreCase("true")) {
+
+                localHashMap.put("Response", "true");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+
+            } else {
+                localHashMap.put("Response", "false");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+            }
+            return localHashMap;
+
+        } catch (Exception ae) {
+            ae.printStackTrace();
+            return localHashMap;
+
+        }
+
+    }
+
+
+    /**
+     * Settings
+     * @param localArrayList
+     * @return
+     */
+
+    public HashMap Settings(ArrayList localArrayList) {
+        ArrayList<HashMap<String, String>> locallist = new ArrayList<HashMap<String, String>>();
+        @SuppressWarnings("rawtypes")
+        HashMap<String, String> localHashMap = new HashMap<String, String>();
+        try {
+
+            JSONObject localJSONObject = new JSONObject(Html.fromHtml(
+                    this.json.makeHttpRequest(url + "SettingChange.php?", "POST",
+                            localArrayList)).toString());
+
+            String status = localJSONObject.getString("ResponseCode");
+            if (status.equalsIgnoreCase("true")) {
+
+                localHashMap.put("Response", "true");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+
+            } else {
+                localHashMap.put("Response", "false");
+                localHashMap.put("MessageWhatHappen", localJSONObject.getString("MessageWhatHappen"));
+            }
+            return localHashMap;
+
+        } catch (Exception ae) {
+            ae.printStackTrace();
+            return localHashMap;
+
+        }
+
+    }
+
 
 
 }

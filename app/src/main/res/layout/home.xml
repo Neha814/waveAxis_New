@@ -358,6 +358,7 @@
             android:layout_weight="1">
 
             <TextView
+                android:id="@+id/current_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sat 10-12-2016"
@@ -365,6 +366,7 @@
                 android:textColor="@color/yellow"/>
 
             <TextView
+                android:id="@+id/current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2:30 pm"

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class StringUtils {
@@ -26,10 +27,10 @@ public class StringUtils {
 	 * @return
 	 */
 
-	public static boolean verify(String paramString) {
+	/*public static boolean verify(String paramString) {
 		return paramString
 				.matches("^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$");
-	}
+	}*/
 	
 	/**
 	 * Date Format conversion
@@ -79,5 +80,49 @@ public class StringUtils {
 		return outputDate;
 
 	}
+
+	/**
+	 * Find Time difference
+	 */
+public static String timeDifferenceInHours (String START_TIME , String END_TIME) {
+	float diffHours = 0;
+	float diffMinutes = 0;
+	try {
+
+		String string1 =START_TIME;
+		Date time1 = new SimpleDateFormat("h:mm a").parse(string1);
+		Calendar calendar1 = Calendar.getInstance();
+		calendar1.setTime(time1);
+
+		String string2 = END_TIME;
+		Date time2 = new SimpleDateFormat("h:mm a").parse(string2);
+		Calendar calendar2 = Calendar.getInstance();
+		calendar2.setTime(time2);
+		//calendar2.add(Calendar.DATE, 1);
+
+		Date x = calendar1.getTime();
+		Date xy = calendar2.getTime();
+
+		Log.e("x==>",""+x);
+		Log.e("xy==>",""+xy);
+
+		/*long diff = x.getTime() - xy.getTime();*/
+        long diff =  xy.getTime()-x.getTime();
+		Log.e("diff==>",""+diff);
+
+		diffMinutes = diff / (60 * 1000);
+		Log.e("diffMinutes==>",""+diffMinutes);
+
+        diffHours = diffMinutes / 60;
+		Log.e("diffHours==>",""+diffHours);
+
+		System.out.println("diff hours" + diffHours);
+
+	} catch(Exception e){
+        e.printStackTrace();
+	}
+
+	return diffHours+"";
+}
 
 }

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:id="@+id/rr"
+    android:minWidth="1000dp"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="100dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:background="@drawable/white_box"
+            android:paddingBottom="70dp"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:weightSum="10"
+                android:background="@drawable/blue_blank_box">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1.5"
+                    android:gravity="center"
+                    android:background="@color/blue"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/user"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="8.5"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginRight="4dp"
+                    android:gravity="center"
+                    android:paddingRight="8dp"
+                    android:background="@color/white"
+                    android:layout_height="match_parent">
+                     <EditText
+                         android:id="@+id/username"
+                           android:layout_width="match_parent"
+                           android:layout_height="match_parent"
+                           android:hint="Username"
+                           android:paddingLeft="20dp"
+                           android:textColor="@color/blue"
+                           android:textSize="@dimen/text_size"
+
+                           android:background="@null"/>
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:weightSum="10"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/blue_blank_box">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1.5"
+                    android:gravity="center"
+                    android:background="@color/blue"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/pswd"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="8.5"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginRight="4dp"
+                    android:gravity="center"
+                    android:paddingRight="8dp"
+                    android:background="@color/white"
+                    android:layout_height="match_parent">
+                    <EditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Password"
+                        android:paddingLeft="20dp"
+                        android:textColor="@color/blue"
+                        android:textSize="@dimen/text_size"
+                        android:inputType="textPassword"
+                        android:background="@null"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:layout_marginTop="40dp"
+                android:textAllCaps="false"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:textSize="@dimen/text_size"
+                android:layout_gravity="right"
+                android:background="@drawable/red_box"
+                android:textColor="@color/yellow"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

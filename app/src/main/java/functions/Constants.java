@@ -21,10 +21,27 @@ public class Constants {
     public static String SPINDLE;
     public static String QULAITY_ISSUE;
 
-    public static String PART_NUMBER = "no part number selected" ;
+    public static String PART_NUMBER = "" ;
     public static String PART_IAMGE ="";
+    public static String PART_ID ="";
 
     public static String OPERATOR_NAME ;
     public static String OPERATOR_ID ;
 
+    public static String CURRENT_DATE;
+    public static String CURRENT_TIME;
+
+    public static String INTERRUPTION_NAME ;
+    public static String INTERRUPTION_ID ;
+    public static String START_TIME ;
+    public static String END_TIME;
+    public static String TOTAL_TIME;
+    public static String TARGET_TIME;
+
+    public static String RESET_TARGET_TIME_VALUE ;
+
+    public static String SETTER_NAME;
+
+    public static String PART_NUMBER_TOSHOW;
+    public static String PART_IAMGE_TOSHOW;
 }

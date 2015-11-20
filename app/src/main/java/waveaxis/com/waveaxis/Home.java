@@ -1,13 +1,16 @@
 package waveaxis.com.waveaxis;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -23,11 +26,17 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.apache.http.message.BasicNameValuePair;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import functions.Constants;
+import functions.Functions;
 import imageloader.ImageLoader;
 import utils.NetConnection;
+import utils.TransparentProgressDialog;
 
 /**
  * Created by sandeep on 17/11/15.
@@ -40,11 +49,13 @@ public class Home extends Activity implements View.OnClickListener {
 
     MyAdapter1 mAdapter1 ;
 
+    MyAdapter2 mAdapter2 ;
+
     LinearLayout start_layout;
 
     Button start_button;
 
-    TextView oee_quality, spindle_value, cp, cpk, part_value, msa;
+    TextView oee_quality, spindle_value, cp, cpk, part_value, msa, current_date, current_time;
 
     LinearLayout part_number_layout , cpp_cpk, spindle_run;
 
@@ -52,9 +63,24 @@ public class Home extends Activity implements View.OnClickListener {
 
     int timerCount = 0;
 
+    boolean firstTimeOnScreen = true;
     boolean isConnected ;
 
     ImageLoader imageLoader;
+
+    int menu_count = 0;
+
+     int opPosToSet = 0;
+
+     int partPosToSet = 0;
+
+    String device_id;
+
+    String device_name;
+
+    TransparentProgressDialog db;
+
+    boolean isSuccess = false  ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,45 +114,23 @@ public class Home extends Activity implements View.OnClickListener {
         part_value = (TextView) findViewById(R.id.part_value);
         part_image = (ImageView) findViewById(R.id.part_image);
         msa = (TextView) findViewById(R.id.msa);
+        current_time = (TextView) findViewById(R.id.current_time);
+        current_date = (TextView) findViewById(R.id.current_date);
 
-        oee_quality.setVisibility(View.GONE);
-        part_number_layout.setVisibility(View.GONE);
-        cpp_cpk.setVisibility(View.GONE);
-        spindle_run.setVisibility(View.GONE);
+        if (isConnected) {
 
-        // set adapter for part number and images
+            device_id = android.provider.Settings.Secure.getString(getApplicationContext()
+                    .getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
-        final ArrayList<String> partList = new ArrayList<String>();
-        partList.add("Part Number");
-        for(int i=0;i<Constants.partsList.size();i++){
-           partList.add(Constants.partsList.get(i).get("part_no")) ;
+            device_name = android.os.Build.MODEL;
+            new addMachine().execute(new Void[0]);
+
+            //
+        } else {
+            showDialog(Constants.No_INTERNET);
         }
-        mAdapter1 = new MyAdapter1(getApplicationContext(),
-                partList);
-        part_number_spinner.setAdapter(mAdapter1);
-
-        // set adapter for operator name
-
-        ArrayList<String> operatorList = new ArrayList<String>();
-        operatorList.add("Operator Name");
-        for(int i=0;i<Constants.operatorList.size();i++) {
-            operatorList.add(Constants.operatorList.get(i).get("operator_name")) ;
-        }
-        mAdapter1 = new MyAdapter1(getApplicationContext(),
-                operatorList);
-        operator_name_spinner.setAdapter(mAdapter1);
 
 
-        ArrayList<String> menuItems = new ArrayList<String>();
-        menuItems.add("Menu");
-        menuItems.add("Setting Change");
-        menuItems.add("Interruption");
-        menuItems.add("Tool Life");
-        menuItems.add("Production Rate");
-
-        mAdapter = new MyAdapter(getApplicationContext(),
-                menuItems);
-        menu_spinner.setAdapter(mAdapter);
 
         start_button.setOnClickListener(this);
         start_layout.setOnClickListener(this);
@@ -135,10 +139,14 @@ public class Home extends Activity implements View.OnClickListener {
            @Override
            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                if (i == 1) {
-                   showSettingDialog();
+                   menu_count = 1;
+                 /*  showSettingDialog();*/
                } else if (i == 2) {
-                   Intent intent = new Intent(Home.this, Interruption_screen.class);
-                   startActivity(intent);
+                   menu_count = 2;
+                /*   Intent intent = new Intent(Home.this, InterruptionScreen.class);
+                   startActivity(intent);*/
+               } else {
+                   menu_count = 0;
                }
            }
 
@@ -151,18 +159,21 @@ public class Home extends Activity implements View.OnClickListener {
         part_number_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(i==0){
-                    Constants.PART_IAMGE = "";
-                    Constants.PART_NUMBER = "no part number selected";
-                }
-                else {
-                    Constants.PART_NUMBER = "Part Number : " + partList.get(i);
-                    Constants.PART_IAMGE = Constants.partsList.get(i-1).get("part_image");
 
-                    Log.e("image url==>",""+Constants.PART_IAMGE);
+                Constants.PART_NUMBER_TOSHOW = "Part Number : " + Constants.partsList.get(i).get("part_no");
+                Constants.PART_IAMGE_TOSHOW = Constants.partsList.get(i).get("part_image");
 
+                Log.e("image url==>", "" + Constants.PART_IAMGE);
+
+                Log.e("firstTimeOnScreen==>", "" + firstTimeOnScreen);
+
+                if (!firstTimeOnScreen) {
+                    Log.e("showImageDialog","showImageDialog");
                     showPartImageDialog();
                 }
+
+                firstTimeOnScreen = false;
+
             }
 
             @Override
@@ -174,15 +185,13 @@ public class Home extends Activity implements View.OnClickListener {
         operator_name_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(i==0){
-                    Constants.OPERATOR_NAME = "";
-                    Constants.OPERATOR_ID = "";
-                }
-                else {
-                    Constants.OPERATOR_NAME = Constants.operatorList.get(i).get("operator_name");
-                    Constants.OPERATOR_ID = Constants.operatorList.get(i).get("operator_id");
 
-                }
+               /* Constants.OPERATOR_NAME = Constants.operatorList.get(i).get("operator_name");
+                Constants.OPERATOR_ID = Constants.operatorList.get(i).get("operator_id");*/
+
+                //  operator_name_spinner.setSelection(opPosToSet);
+
+
             }
 
             @Override
@@ -192,70 +201,9 @@ public class Home extends Activity implements View.OnClickListener {
         });
 
 
-        msa.setText("MSA - " + Constants.MACHINE_ID);
-       final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-
-                Log.e("timer==>", "" + timerCount);
-                if (timerCount == 0) {
-
-                    oee_quality.setVisibility(View.VISIBLE);
-                    part_number_layout.setVisibility(View.GONE);
-                    cpp_cpk.setVisibility(View.GONE);
-                    spindle_run.setVisibility(View.GONE);
-
-                    oee_quality.setText("Overall Equipment Effectiveness : "+ Constants.OEE);
-                }
-
-                else if (timerCount == 1) {
-                    oee_quality.setVisibility(View.GONE);
-                    part_number_layout.setVisibility(View.GONE);
-                    cpp_cpk.setVisibility(View.GONE);
-                    spindle_run.setVisibility(View.VISIBLE);
-
-                    spindle_value.setText("No of Spindle Run : "+Constants.SPINDLE);
-                }
-
-                else if (timerCount == 2) {
-                    oee_quality.setVisibility(View.GONE);
-                    part_number_layout.setVisibility(View.GONE);
-                    spindle_run.setVisibility(View.GONE);
-                    cpp_cpk.setVisibility(View.VISIBLE);
-
-                    cp.setText("CP : "+Constants.CP);
-                    cpk.setText("CPK : "+Constants.CPK);
-                }
-
-                else if (timerCount == 3) {
-
-                    oee_quality.setVisibility(View.VISIBLE);
-                    part_number_layout.setVisibility(View.GONE);
-                    spindle_run.setVisibility(View.GONE);
-                    cpp_cpk.setVisibility(View.GONE);
-
-                    oee_quality.setText("Quality Issue : "+Constants.QULAITY_ISSUE);
-                }
-
-                else if(timerCount == 4){
-                    oee_quality.setVisibility(View.GONE);
-                    part_number_layout.setVisibility(View.VISIBLE);
-                    spindle_run.setVisibility(View.GONE);
-                    cpp_cpk.setVisibility(View.GONE);
-
-                    part_value.setText(Constants.PART_NUMBER);
-                    imageLoader.DisplayImage(Constants.PART_IAMGE,R.drawable.noimg,part_image);
 
 
-                }
 
-                timerCount++;
-                if (timerCount == 5) {
-                    timerCount = 0;
-                }
-                handler.postDelayed(this, 10000L);
-            }
-        }, 1000);
 
 
     }
@@ -279,9 +227,10 @@ public class Home extends Activity implements View.OnClickListener {
 
                 part_iamge = (ImageView) dialog.findViewById(R.id.part_iamge);
 
-                Log.e("url==>",""+Constants.PART_IAMGE);
+                Log.e("url==>",""+Constants.PART_IAMGE_TOSHOW);
 
-                imageLoader.DisplayImage(Constants.PART_IAMGE,R.drawable.noimg,part_iamge);
+                imageLoader.DisplayImage(Constants.PART_IAMGE_TOSHOW,R.drawable.noimg,part_iamge);
+
                 dialog.show();
             } catch (Exception e) {
 
@@ -307,21 +256,63 @@ public class Home extends Activity implements View.OnClickListener {
            LinearLayout save_layout, next_layout;
             Button save_button, next_button;
 
+          final   Spinner inner_part_spinner, inner_operator_spinner;
+
             save_layout = (LinearLayout) dialog.findViewById(R.id.save_layout);
             save_button = (Button) dialog.findViewById(R.id.save_button);
             next_layout = (LinearLayout) dialog.findViewById(R.id.next_layout);
             next_button = (Button) dialog.findViewById(R.id.next_button);
+            inner_operator_spinner = (Spinner) dialog.findViewById(R.id.inner_operator_spinner);
+            inner_part_spinner = (Spinner) dialog.findViewById(R.id.inner_part_spinner);
+
+            final ArrayList<String> partList = new ArrayList<String>();
+            partList.add("Part Number");
+            for(int i=0;i<Constants.partsList.size();i++){
+                partList.add(Constants.partsList.get(i).get("part_no")) ;
+            }
+            mAdapter2 = new MyAdapter2(Home.this,
+                    partList);
+            inner_part_spinner.setAdapter(mAdapter2);
+
+            // set adapter for operator name
+
+            ArrayList<String> operatorList = new ArrayList<String>();
+            operatorList.add("Operator Name");
+            for(int i=0;i<Constants.operatorList.size();i++) {
+                operatorList.add(Constants.operatorList.get(i).get("operator_name")) ;
+            }
+            mAdapter2 = new MyAdapter2(Home.this,
+                    operatorList);
+            inner_operator_spinner.setAdapter(mAdapter2);
 
             save_layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                   dialog.dismiss();
+                    dialog.dismiss();
+
+                    int partPOS =  inner_part_spinner.getSelectedItemPosition();
+                    int opPOS = inner_operator_spinner.getSelectedItemPosition();
+
+                  String   partID = Constants.partsList.get(partPOS).get("part_id");
+                   String  opID = Constants.partsList.get(opPOS).get("operator_id");
+
+                    if(partPOS==0){
+                        showDialog("Please select Part Number");
+                    } else if(opPOS==0){
+                        showDialog("Please select Operator Name");
+                    } else {
+                        CallSettingAPI(partID,opID);
+                    }
+
                 }
+
+
             });
             save_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     dialog.dismiss();
+
                 }
             });
             next_layout.setOnClickListener(new View.OnClickListener() {
@@ -337,6 +328,7 @@ public class Home extends Activity implements View.OnClickListener {
                 }
             });
             dialog.show();
+
         } catch (Exception e) {
 
             e.printStackTrace();
@@ -344,11 +336,22 @@ public class Home extends Activity implements View.OnClickListener {
 
     }
 
+    private void CallSettingAPI(String partID, String opID) {
+
+        new Settings(partID,opID).execute(new Void[0]);
+    }
+
     @Override
     public void onClick(View view) {
-        if(view==start_button || view == start_layout){
-            Intent i = new Intent(Home.this , Interruption_screen.class);
-            startActivity(i);
+
+         if(view==start_button || view==start_layout){
+             Log.e("menu_count==",""+menu_count);
+            if (menu_count == 1) {
+                showSettingDialog();
+            } else if (menu_count == 2) {
+                Intent intent = new Intent(Home.this, InterruptionScreen.class);
+                startActivity(intent);
+            }
         }
     }
 
@@ -473,4 +476,445 @@ public class Home extends Activity implements View.OnClickListener {
         }
 
     }
+
+
+
+    class MyAdapter2 extends BaseAdapter {
+
+        LayoutInflater mInflater = null;
+
+        ArrayList<String> ListItems = new ArrayList<String>();
+
+        public MyAdapter2(Context context,
+                          ArrayList<String> ListDetail) {
+            mInflater = LayoutInflater.from(getApplicationContext());
+            ListItems= ListDetail;
+
+        }
+
+
+        @Override
+        public int getCount() {
+
+            return ListItems.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return ListItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            // TODO Auto-generated method stub
+            return position;
+        }
+
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return getCustomView(position, convertView, parent, R.layout.part_no_itemlist, true);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            return getCustomView(position, convertView, parent, R.layout.part_no_itemlist, false);
+        }
+
+        public View getCustomView(int position, View convertView, ViewGroup parent, int spinnerRow, boolean isDefaultRow) {
+            LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View row = inflater.inflate(spinnerRow, parent, false);
+            TextView txt = (TextView)row.findViewById(R.id.text);
+
+            txt.setText(ListItems.get(position));
+            return row;
+        }
+
+    }
+
+    // ******************************** Settings API ******************************************//
+
+    public class Settings extends AsyncTask<Void , Void ,Void >{
+
+        Functions function = new Functions();
+
+        HashMap<String, String> result = new HashMap<String, String>();
+
+        ArrayList localArrayList = new ArrayList();
+
+        String PART_ID , OP_ID ;
+
+        public Settings(String partID, String opID) {
+            this.PART_ID = partID;
+            this.OP_ID =opID;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+              /* http://phphosting.osvin.net/waveaxisNew/Web_API/SettingChange.php?
+              MachineId=11&PartId=4&OperatorId=1*/
+
+            try {
+                localArrayList.add(new BasicNameValuePair("PartId", this.PART_ID));
+                localArrayList.add(new BasicNameValuePair("OperatorId",this.OP_ID));
+                localArrayList.add(new BasicNameValuePair("MachineId", Constants.MACHINE_ID));
+
+                result = function.Settings(localArrayList);
+
+            } catch (Exception localException) {
+                localException.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            db.dismiss();
+
+            try {
+
+                String response = (String)result.get("Response");
+                String message = (String) result.get("MessageWhatHappen");
+                if (response.equals("true")) {
+                    isSuccess = true ;
+                    showDialog(message);
+
+                } else {
+
+                    showDialog(message);
+                }
+            }
+
+            catch (Exception ae) {
+                ae.printStackTrace();
+
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            try {
+                db = new TransparentProgressDialog(Home.this,
+                        R.drawable.loadingicon);
+                db.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // ******************************* show Dialog ********************************************//
+    public void showDialog(String msg) {
+        try {
+            AlertDialog alertDialog = new AlertDialog.Builder(
+                    Home.this).create();
+
+            alertDialog.setTitle("Alert !");
+            alertDialog.setMessage(msg);
+            //alertDialog.setIcon(R.drawable.browse);
+            // Setting OK Button
+            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // Write your code here to execute after dialog closed
+                    dialog.cancel();
+                    if(isSuccess){
+                        Intent i = new Intent(Home.this , Home.class);
+                        startActivity(i);
+                    }
+
+                }
+            });
+
+            // Showing Alert Message
+            alertDialog.show();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+
+    public class addMachine extends AsyncTask<Void, Void, Void> {
+        Functions function = new Functions();
+
+        HashMap<String, String> result = new HashMap<String, String>();
+
+        ArrayList localArrayList = new ArrayList();
+
+        protected Void doInBackground(Void... paramVarArgs) {
+
+
+            //http://phphosting.osvin.net/waveaxisNew/Web_API/addDevice.php?devicename=XT1033&devicetoken=3ioio
+
+            try {
+                localArrayList.add(new BasicNameValuePair("devicetoken", device_id));
+                localArrayList.add(new BasicNameValuePair("devicename", device_name));
+
+                result = function.AddDevice(localArrayList);
+
+            } catch (Exception localException) {
+                localException.printStackTrace();
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(Void paramVoid) {
+            // db.dismiss();
+
+            try {
+
+                String response = (String)result.get("Response");
+                if (response.equals("true")) {
+
+                    Constants.DEVICE_ID = (String) result.get("deviceid");
+                    new GetMachineDetails().execute(new Void[0]);
+
+                } else {
+                    showDialog("Device not added.Please try again.");
+                }
+            }
+
+            catch (Exception ae) {
+                ae.printStackTrace();
+                showDialog(Constants.ERROR_MSG);
+            }
+
+        }
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            try {
+               /* db = new TransparentProgressDialog(SplashScreen.this,
+                        R.drawable.loadingicon);
+                db.show();*/
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+    public class GetMachineDetails extends AsyncTask<Void, Void, Void> {
+        Functions function = new Functions();
+
+        HashMap<String, String> result = new HashMap<String, String>();
+
+        ArrayList localArrayList = new ArrayList();
+
+        protected Void doInBackground(Void... paramVarArgs) {
+
+
+            // http://phphosting.osvin.net/waveaxisNew/Web_API/getMachinenModule.php?deviceid=3
+
+            try {
+                localArrayList.add(new BasicNameValuePair("deviceid", Constants.DEVICE_ID));
+
+                result = function.GetMachineDetails(localArrayList);
+
+            } catch (Exception localException) {
+                localException.printStackTrace();
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(Void paramVoid) {
+             db.dismiss();
+
+            try {
+
+                String response = (String)result.get("Response");
+                if (response.equals("true")) {
+
+                    Constants.MACHINE_ID = (String) result.get("machine_id");
+                    Constants.MACHINE_NAME = (String) result.get("machine_name");
+
+                    Constants.OEE = (String) result.get("equipment_effectiveness");
+                    Constants.CP = (String) result.get("cp");
+                    Constants.CPK = (String) result.get("cpk");
+                    Constants.SPINDLE = (String) result.get("no_of_spindleRun");
+                    Constants.QULAITY_ISSUE = (String) result.get("quality_issue");
+                    Constants.PART_NUMBER = (String) result.get("default_part_no");
+                    Constants.OPERATOR_NAME = (String) result.get("default_operator");
+                    Constants.OPERATOR_ID = (String) result.get("default_operator_id");
+                    Constants.PART_ID = (String) result.get("");
+                    Constants.PART_IAMGE = (String) result.get("");
+
+                    FillAllDetails();
+
+                } else if(response.equals("false")) {
+                    showDialog("No data found");
+                }
+                else {
+                    showDialog(Constants.ERROR_MSG);
+                }
+            }
+
+            catch (Exception ae) {
+                ae.printStackTrace();
+                showDialog(Constants.ERROR_MSG);
+            }
+
+        }
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            try {
+                db = new TransparentProgressDialog(Home.this,
+                        R.drawable.loadingicon);
+                db.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void FillAllDetails() {
+        long date = System.currentTimeMillis();
+
+        SimpleDateFormat dateToShow = new SimpleDateFormat("dd-MM-yyyy");
+        String currentDate = dateToShow.format(date);
+
+        current_date.setText(currentDate);
+        Constants.CURRENT_DATE = currentDate;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        String timeString = sdf.format(date);
+
+        current_time.setText(timeString);
+        Constants.CURRENT_TIME = timeString;
+
+        oee_quality.setVisibility(View.GONE);
+        part_number_layout.setVisibility(View.GONE);
+        cpp_cpk.setVisibility(View.GONE);
+        spindle_run.setVisibility(View.GONE);
+
+
+        // set adapter for part number and images
+
+        final ArrayList<String> partList = new ArrayList<String>();
+
+
+        for(int i=0;i<Constants.partsList.size();i++){
+
+            partList.add(Constants.partsList.get(i).get("part_no")) ;
+            if(Constants.PART_NUMBER.equals(Constants.partsList.get(i).get("part_no"))){
+                partPosToSet = i;
+            }
+        }
+        mAdapter1 = new MyAdapter1(getApplicationContext(),
+                partList);
+        part_number_spinner.setAdapter(mAdapter1);
+        part_number_spinner.setSelection(partPosToSet);
+
+        final Handler Timerhandler = new Handler();
+        Timerhandler.postDelayed(new Runnable() {
+            public void run() {
+                long date = System.currentTimeMillis();
+
+                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+                String timeString = sdf.format(date);
+
+                current_time.setText(timeString);
+                Constants.CURRENT_TIME = timeString;
+                Timerhandler.postDelayed(this, 4000L);
+            }
+        }, 1000);
+
+
+        // set adapter for operator name
+
+        ArrayList<String> operatorList = new ArrayList<String>();
+
+
+        for(int i=0;i<Constants.operatorList.size();i++) {
+            operatorList.add(Constants.operatorList.get(i).get("operator_name")) ;
+            if(Constants.OPERATOR_NAME.equals(Constants.operatorList.get(i).get("operator_name"))){
+
+                opPosToSet = i;
+            }
+        }
+        mAdapter1 = new MyAdapter1(getApplicationContext(),
+                operatorList);
+        operator_name_spinner.setAdapter(mAdapter1);
+        operator_name_spinner.setSelection(opPosToSet);
+
+
+
+
+        ArrayList<String> menuItems = new ArrayList<String>();
+        menuItems.add("Menu");
+        menuItems.add("Setting Change");
+        menuItems.add("Interruption");
+        menuItems.add("Tool Life");
+        menuItems.add("Production Rate");
+
+        mAdapter = new MyAdapter(getApplicationContext(),
+                menuItems);
+        menu_spinner.setAdapter(mAdapter);
+
+
+        msa.setText(Constants.MACHINE_NAME+" - " + Constants.MACHINE_ID);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+
+                Log.e("timer==>", "" + timerCount);
+                if (timerCount == 0) {
+
+                    oee_quality.setVisibility(View.VISIBLE);
+                    part_number_layout.setVisibility(View.GONE);
+                    cpp_cpk.setVisibility(View.GONE);
+                    spindle_run.setVisibility(View.GONE);
+
+                    oee_quality.setText("Overall Equipment Effectiveness : " + Constants.OEE);
+                } else if (timerCount == 1) {
+                    oee_quality.setVisibility(View.GONE);
+                    part_number_layout.setVisibility(View.GONE);
+                    cpp_cpk.setVisibility(View.GONE);
+                    spindle_run.setVisibility(View.VISIBLE);
+
+                    spindle_value.setText("No of Spindle Run : " + Constants.SPINDLE);
+                } else if (timerCount == 2) {
+                    oee_quality.setVisibility(View.GONE);
+                    part_number_layout.setVisibility(View.GONE);
+                    spindle_run.setVisibility(View.GONE);
+                    cpp_cpk.setVisibility(View.VISIBLE);
+
+                    cp.setText("CP : " + Constants.CP);
+                    cpk.setText("CPK : " + Constants.CPK);
+                } else if (timerCount == 3) {
+
+                    oee_quality.setVisibility(View.VISIBLE);
+                    part_number_layout.setVisibility(View.GONE);
+                    spindle_run.setVisibility(View.GONE);
+                    cpp_cpk.setVisibility(View.GONE);
+
+                    oee_quality.setText("Quality Issue : " + Constants.QULAITY_ISSUE);
+                } else if (timerCount == 4) {
+                    oee_quality.setVisibility(View.GONE);
+                    part_number_layout.setVisibility(View.VISIBLE);
+                    spindle_run.setVisibility(View.GONE);
+                    cpp_cpk.setVisibility(View.GONE);
+
+                    part_value.setText(Constants.PART_NUMBER);
+                    imageLoader.DisplayImage(Constants.PART_IAMGE, R.drawable.noimg, part_image);
+
+
+                }
+
+                timerCount++;
+                if (timerCount == 5) {
+                    timerCount = 0;
+                }
+                handler.postDelayed(this, 10000L);
+            }
+        }, 1000);
+    }
+
 }
