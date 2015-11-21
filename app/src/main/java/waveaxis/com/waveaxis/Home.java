@@ -3,6 +3,7 @@ package waveaxis.com.waveaxis;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,9 +58,12 @@ public class Home extends Activity implements View.OnClickListener {
 
     TextView oee_quality, spindle_value, cp, cpk, part_value, msa, current_date, current_time;
 
-    LinearLayout part_number_layout , cpp_cpk, spindle_run;
+    LinearLayout part_number_layout , cpp_cpk, spindle_run, cal_layout;
 
-    ImageView part_image;
+    ImageView part_image, cal_img;
+
+    public static final String CALCULATOR_PACKAGE ="com.android.calculator2";
+    public static final String CALCULATOR_CLASS ="com.android.calculator2.Calculator";
 
     int timerCount = 0;
 
@@ -116,6 +120,8 @@ public class Home extends Activity implements View.OnClickListener {
         msa = (TextView) findViewById(R.id.msa);
         current_time = (TextView) findViewById(R.id.current_time);
         current_date = (TextView) findViewById(R.id.current_date);
+        cal_img = (ImageView) findViewById(R.id.cal_img);
+        cal_layout = (LinearLayout) findViewById(R.id.cal_layout);
 
         if (isConnected) {
 
@@ -134,6 +140,8 @@ public class Home extends Activity implements View.OnClickListener {
 
         start_button.setOnClickListener(this);
         start_layout.setOnClickListener(this);
+        cal_layout.setOnClickListener(this);
+        cal_img.setOnClickListener(this);
 
        menu_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
            @Override
@@ -200,12 +208,6 @@ public class Home extends Activity implements View.OnClickListener {
             }
         });
 
-
-
-
-
-
-
     }
 
 
@@ -248,7 +250,7 @@ public class Home extends Activity implements View.OnClickListener {
             dialog.getWindow().setFormat(PixelFormat.TRANSLUCENT);
             dialog.setContentView(R.layout.part_no_operator_dialog);
             getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            dialog.setCancelable(false);
+            dialog.setCancelable(true);
             Drawable d = new ColorDrawable(Color.BLACK);
             d.setAlpha(0);
             dialog.getWindow().setBackgroundDrawable(d);
@@ -372,14 +374,28 @@ public class Home extends Activity implements View.OnClickListener {
     public void onClick(View view) {
 
          if(view==start_button || view==start_layout){
-             Log.e("menu_count==",""+menu_count);
+
             if (menu_count == 1) {
                 showSettingDialog();
             } else if (menu_count == 2) {
                 Intent intent = new Intent(Home.this, InterruptionScreen.class);
                 startActivity(intent);
             }
+
         }
+
+         else if(view==cal_img || view==cal_layout){
+             Intent intent = new Intent();
+
+             Log.e("CALCULATOR LISTENER==>>","CALCULATOR LISTENER==>>");
+
+             intent.setAction(Intent.ACTION_MAIN);
+             intent.addCategory(Intent.CATEGORY_LAUNCHER);
+             intent.setComponent(new ComponentName(
+                     CALCULATOR_PACKAGE,
+                     CALCULATOR_CLASS));
+             startActivity(intent);
+         }
     }
 
     class MyAdapter extends BaseAdapter {

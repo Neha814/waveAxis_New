@@ -3,6 +3,7 @@ package waveaxis.com.waveaxis;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -52,11 +55,16 @@ public class InterruptionScreen extends Activity implements View.OnClickListener
     TextView msa,operator_name, part_number,oee, target_time,cp, cpk,current_date,
             current_time,interruption_text ,start_time ,end_time, total_time;
 
-    LinearLayout reset_layout;
+    LinearLayout reset_layout, cal_layout;
 
     Button reset_button , fixed;
 
+    public static final String CALCULATOR_PACKAGE ="com.android.calculator2";
+    public static final String CALCULATOR_CLASS ="com.android.calculator2.Calculator";
+
     TransparentProgressDialog db;
+
+    ImageView cal_img;
 
     Boolean isConnected ;
 
@@ -101,11 +109,15 @@ public class InterruptionScreen extends Activity implements View.OnClickListener
         end_time = (TextView) findViewById(R.id.end_time);
         total_time = (TextView) findViewById(R.id.total_time);
         fixed = (Button) findViewById(R.id.fixed);
+        cal_img = (ImageView) findViewById(R.id.cal_img);
+        cal_layout = (LinearLayout) findViewById(R.id.cal_layout);
 
 
         reset_layout.setOnClickListener(this);
         reset_button.setOnClickListener(this);
         fixed.setOnClickListener(this);
+        cal_layout.setOnClickListener(this);
+        cal_img.setOnClickListener(this);
 
         operator_name.setText("Operator Name : " + Constants.OPERATOR_NAME);
         part_number.setText(Constants.PART_NUMBER);
@@ -222,6 +234,19 @@ public class InterruptionScreen extends Activity implements View.OnClickListener
             } else {
                showDialog("Please select interruption first.");
             }
+        }
+
+        else if(view==cal_img || view==cal_layout){
+            Intent intent = new Intent();
+
+            Log.e("CALCULATOR LISTENER==>>", "CALCULATOR LISTENER==>>");
+
+            intent.setAction(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            intent.setComponent(new ComponentName(
+                    CALCULATOR_PACKAGE,
+                    CALCULATOR_CLASS));
+            startActivity(intent);
         }
 
         else if(view == fixed){
